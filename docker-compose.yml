@@ -15,3 +15,37 @@ services:
       MYSQL_PASSWORD: lmspass
     ports:
       - "3307:3306"
+	  version: "3.9"
+
+	  services:
+	    app:
+	      build: .
+	      container_name: library-app
+	      ports:
+	        - "9070:8080"   # Expose Tomcat on localhost:9070
+	      depends_on:
+	        - db
+	      environment:
+	        # Spring/Hibernate/JDBC can use these
+	        DB_HOST: db
+	        DB_PORT: 3306
+	        DB_NAME: librarydb
+	        DB_USER: libraryuser
+	        DB_PASSWORD: librarypass
+
+	    db:
+	      image: mysql:8.0
+	      container_name: library-db
+	      restart: always
+	      environment:
+	        MYSQL_DATABASE: librarydb
+	        MYSQL_USER: libraryuser
+	        MYSQL_PASSWORD: librarypass
+	        MYSQL_ROOT_PASSWORD: rootpass
+	      ports:
+	        - "3307:3306"   # optional: expose DB outside for debugging
+	      volumes:
+	        - db_data:/var/lib/mysql
+
+	  volumes:
+	    db_data:
